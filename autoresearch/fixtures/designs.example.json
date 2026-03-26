@@ -1,0 +1,11 @@
+{
+  "designs": [
+    {
+      "url": "https://www.figma.com/design/YOUR_FILE_KEY/Design-Name?node-id=0-1&m=dev",
+      "feature": "0",
+      "name": "your-design-name",
+      "componentManifest": "./manifest.json"
+    }
+  ],
+  "_note": "Copy to designs.json and fill in your Figma URLs. Open each file in Figma, run --refresh to cache."
+}

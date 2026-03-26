@@ -1,0 +1,27 @@
+{
+  "name": "figma-brief",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Local CLI that compiles Figma-native context into an agent-friendly implementation brief.",
+  "bin": {
+    "figma-brief": "./bin/figma-brief.js"
+  },
+  "scripts": {
+    "test": "node --test",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write ."
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.28.0",
+    "commander": "^14.0.3",
+    "playwright": "^1.52.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.9"
+  }
+}

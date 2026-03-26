@@ -1,0 +1,10 @@
+node_modules/
+.artifacts/
+.fixtures/
+autoresearch/cache/
+autoresearch/results.tsv
+autoresearch/run.log
+autoresearch/judge-*.md
+autoresearch/judge-score-*.txt
+autoresearch/fixtures/designs.json
+autoresearch/plateau-report.md
