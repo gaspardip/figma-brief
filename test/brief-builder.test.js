@@ -91,8 +91,9 @@ test("buildBrief assembles normalized design context", () => {
   assert.ok(brief.confidence.overall > 0.7);
 
   const prompt = buildPrompt(brief);
-  assert.match(prompt, /Code Connect mappings and snippets/);
-  assert.match(prompt, /Preserve focus ring/);
+  assert.match(prompt, /Implementation Brief/);
+  assert.match(prompt, /REQUIRED: Visual Fidelity/);
+  assert.match(prompt, /Pre-Implementation Checklist/);
 });
 
 test("buildBrief includes overviewNotes when provided", () => {

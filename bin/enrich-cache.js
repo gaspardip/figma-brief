@@ -81,9 +81,7 @@ async function callClaude(content) {
       proc.stdin.end();
     });
   } catch (error) {
-    console.error(
-      `  Claude extraction failed: ${error.message.slice(0, 200)}`,
-    );
+    console.error(`  Claude extraction failed: ${error.message.slice(0, 200)}`);
     return null;
   }
 }
@@ -102,12 +100,16 @@ async function enrichDesign(cacheFile, force) {
   const content = cached.designContext ?? cached.featureMetadata;
 
   if (!content || typeof content !== "string" || content.length < 100) {
-    console.log(`  ${name}: no content to enrich (${content?.length ?? 0} chars)`);
+    console.log(
+      `  ${name}: no content to enrich (${content?.length ?? 0} chars)`,
+    );
     return false;
   }
 
   const source = cached.designContext ? "designContext" : "featureMetadata";
-  console.log(`  ${name}: extracting from ${content.length} chars of ${source}...`);
+  console.log(
+    `  ${name}: extracting from ${content.length} chars of ${source}...`,
+  );
 
   const extraction = await callClaude(content);
 
@@ -146,7 +148,9 @@ async function main() {
     .filter((f) => !onlyTarget || f.toLowerCase().includes(onlyTarget));
 
   if (cacheFiles.length === 0) {
-    console.log("No cache files found. Run bin/autoresearch.js --refresh first.");
+    console.log(
+      "No cache files found. Run bin/autoresearch.js --refresh first.",
+    );
     return;
   }
 
