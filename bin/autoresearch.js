@@ -15,6 +15,7 @@ import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { buildBrief } from "../lib/brief-builder.js";
 import { detectFeatures, selectFeature } from "../lib/feature-detector.js";
+import { classifyChildFrames } from "../lib/frame-classifier.js";
 import { createLogger } from "../lib/logger.js";
 import { extractOverviewNotes } from "../lib/overview-extractor.js";
 import { parseMetadataXml } from "../lib/parse-metadata-xml.js";
@@ -214,6 +215,41 @@ async function ensureCachedData(design, log) {
     const screenshotPath = path.join(screenshotDir, "screenshot.png");
     await figma.getScreenshot(featureNodeId, screenshotPath).catch(() => null);
 
+    // Per-frame screenshots: classify children, screenshot each screen frame
+    const frameScreenshots = {};
+
+    if (featureNode) {
+      const { screens } = classifyChildFrames(featureNode);
+
+      if (screens.length > 0) {
+        log("Screenshotting individual frames", { count: screens.length });
+
+        for (const screen of screens) {
+          const framePath = path.join(
+            screenshotDir,
+            `frame-${screen.nodeId.replace(":", "-")}.png`,
+          );
+          const saved = await figma
+            .getScreenshot(screen.nodeId, framePath)
+            .catch(() => null);
+
+          if (saved) {
+            frameScreenshots[screen.nodeId] = {
+              name: screen.name,
+              path: framePath,
+              width: screen.width,
+              height: screen.height,
+            };
+          }
+        }
+
+        log("Frame screenshots captured", {
+          captured: Object.keys(frameScreenshots).length,
+          total: screens.length,
+        });
+      }
+    }
+
     const cached = {
       fetchedAt: new Date().toISOString(),
       designUrl: design.url,
@@ -223,6 +259,7 @@ async function ensureCachedData(design, log) {
       designContext,
       variables,
       screenshotPath,
+      frameScreenshots,
       expandedInstances,
     };
 
@@ -378,6 +415,26 @@ async function buildBriefFromCache(cached, design, log) {
     rawDesignContext = { code: cached.designContext };
   }
 
+  // Copy frame screenshots from cache to output dir
+  let frameScreenshots = null;
+
+  if (
+    cached.frameScreenshots &&
+    Object.keys(cached.frameScreenshots).length > 0
+  ) {
+    frameScreenshots = {};
+
+    for (const [nodeId, frame] of Object.entries(cached.frameScreenshots)) {
+      try {
+        const destPath = path.join(outputDir, path.basename(frame.path));
+        await fs.copyFile(frame.path, destPath);
+        frameScreenshots[nodeId] = { ...frame, path: destPath };
+      } catch {
+        // Frame screenshot missing from cache — skip
+      }
+    }
+  }
+
   const brief = buildBrief({
     target,
     node: targetNode,
@@ -395,6 +452,7 @@ async function buildBriefFromCache(cached, design, log) {
     componentManifest,
     flowNotes: [],
     overviewNotes,
+    frameScreenshots,
   });
 
   const prompt = buildPrompt(brief);
