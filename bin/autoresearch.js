@@ -180,6 +180,13 @@ async function ensureCachedData(design, log) {
       figma.getVariableDefs(featureNodeId).catch(() => null),
     ]);
 
+    // Fetch comments via REST API (separate from MCP, different rate limit)
+    const comments = await figma.getComments().catch(() => []);
+
+    if (comments.length > 0) {
+      log("Fetched Figma comments", { count: comments.length });
+    }
+
     // Expand annotation instances to cache their interior text
     const expandedInstances = {};
     const featureNode = parseMetadataXml(featureMetadata);
@@ -260,6 +267,7 @@ async function ensureCachedData(design, log) {
       variables,
       screenshotPath,
       frameScreenshots,
+      comments,
       expandedInstances,
     };
 
@@ -439,7 +447,7 @@ async function buildBriefFromCache(cached, design, log) {
     target,
     node: targetNode,
     rawNodePayload: null,
-    comments: [],
+    comments: cached.comments ?? [],
     devResources: [],
     imageFillMap: {},
     screenshotPath,
