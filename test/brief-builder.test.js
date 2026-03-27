@@ -93,7 +93,7 @@ test("buildBrief assembles normalized design context", () => {
   const prompt = buildPrompt(brief);
   assert.match(prompt, /Implementation Brief/);
   assert.match(prompt, /REQUIRED: Visual Fidelity/);
-  assert.match(prompt, /Pre-Implementation Checklist/);
+  assert.match(prompt, /Present your plan and WAIT/);
 });
 
 test("buildBrief includes overviewNotes when provided", () => {
